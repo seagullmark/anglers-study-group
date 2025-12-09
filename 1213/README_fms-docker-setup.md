@@ -16,8 +16,7 @@ docker pull ubuntu:24.04
 
 ## ⚙️ Docker Desktop 設定メモ（macOS）【独自補足】
 
-1. Settings → Resources → File Sharing の “Choose file sharing implementation for your containers” は必ず `gRPC FUSE` に切り替えること。
-2. 旧実装の `osxfs` はファイルロックや inotify 通知の扱いに制限があり、FileMaker Server の .deb 展開時に dpkg が固まりインストールが途中停止する既知の問題がある。
+Settings → Resources → File Sharing の "Choose file sharing implementation for your containers" は、デフォルト値の `VirtioFS` のままではインストールが失敗するため、必ず `gRPC FUSE` に切り替えること。
 
 ---
 
