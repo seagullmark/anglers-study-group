@@ -52,10 +52,10 @@ SESSION_DRIVER=file
 `vite.config.js` を以下のように編集:
 
 ```js
-import { defineConfig } from 'vite';
-import laravel from 'laravel-vite-plugin';
-import tailwindcss from '@tailwindcss/vite';
-import vue from '@vitejs/plugin-vue';
+import { defineConfig } from 'vite'
+import laravel from 'laravel-vite-plugin'
+import tailwindcss from '@tailwindcss/vite'
+import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
     plugins: [
@@ -73,7 +73,7 @@ export default defineConfig({
           }
         }),
     ],
-});
+})
 ```
 
 ### Inertia をインストール (サーバーサイド)
@@ -122,6 +122,7 @@ $middleware->web(append: [
 ```
 
 `resources/js/app.js` を以下の内容に変更:
+（`resources/js/bootstrap.js` は削除してよい）
 
 ```js
 import { createApp, h } from 'vue';
@@ -147,9 +148,9 @@ createInertiaApp({
 ```vue
 <template>Hello {{ counter }}!</template>
 <script setup>
-import { ref } from 'vue'
-const counter = ref(0)
-setInterval(() => counter.value++, 1000)
+  import { ref } from 'vue'
+  const counter = ref(0)
+  setInterval(() => counter.value++, 1000)
 </script>
 ```
 
@@ -170,6 +171,76 @@ Route::get('/', function () {
 ```
 
 ブラウザで `http://localhost` を開いてカウンターが動けばOK。
+
+---
+
+## その他インストール
+
+### Eloquent FileMaker
+
+参考: <https://github.com/gearbox-solutions/eloquent-filemaker>
+
+1. インストール（Sail 内で実行）
+
+   ```bash
+   ./vendor/bin/sail composer require gearbox-solutions/eloquent-filemaker
+   ```
+
+2. FileMaker 接続設定
+
+   - `config/database.php` に FileMaker 用の接続を追加
+   - `.env` に接続情報を追加
+
+3. キャッシュドライバ
+
+   `.env` に `CACHE_STORE=file` を指定。FileMaker ドライバは `file` キャッシュ以外では正常に動作しない。
+
+4. SSL 対応
+
+   開発時にオレオレ証明書を避けるために **直接 `verify:false` を書くのはNG**。`.env` から制御する設定を用意する。
+
+   `config/my.php`：
+
+   ```php
+   <?php
+
+   return [
+       /*
+       |--------------------------------------------------------------------------
+       | Guzzle HTTP Client の SSL 検証
+       |--------------------------------------------------------------------------
+       |
+       | SSL検証しないときは false を指定します。
+       |
+       */
+
+       'verify_ssl' => env('MY_VERIFY_SSL', true),
+   ];
+   ```
+
+   app/Providers/AppServiceProvider.php：
+
+   ```php
+   use Illuminate\Support\Facades\Http;
+
+   Http::globalOptions([
+       'verify' => config('my.verify_ssl', true),
+   ]);
+   ```
+
+5. 接続確認（Tinker）
+
+   モデル経由でデータが取得できるか `./vendor/bin/sail artisan tinker` で確認できる。
+
+   ```bash
+   ./vendor/bin/sail artisan tinker
+   ```
+
+   ```text
+    App\Models\History::all()
+   ```
+
+   セッション終了は `Ctrl + D`（macOS / Linux）または `Ctrl + Z` → `Enter`（Windows）。
 
 ---
 
@@ -235,6 +306,47 @@ createInertiaApp({
 
 - `php_en.json` と `php_ja.json` が生成される
 - Vite サーバ終了時に削除されるため `.gitignore` に追加すること
+
+---
+
+## Ziggy（静的生成＋ziggy-js）
+
+**目的**：Blade の `@routes` によるインライン `<script>` を出さず、CSP をクリーン（`script-src 'self'`）に保つ。
+
+### 手順（Sail + npm 前提）
+
+1. パッケージをインストール（すべて Sail コンテナ内で実行）
+
+   ```bash
+   ./vendor/bin/sail composer require tightenco/ziggy
+   ./vendor/bin/sail npm install ziggy-js
+   ```
+
+2. ルート定義を静的ファイルに出力（ルート変更のたびに再実行してコミット）
+
+   ```bash
+   ./vendor/bin/sail artisan ziggy:generate resources/js/ziggy.js
+   ```
+
+3. Blade の `<body>` から `@routes` を削除（インライン JS を排除）
+
+4. `resources/js/app.js` に Ziggy を注入
+
+   ```js
+   import { ZiggyVue } from 'ziggy-js'
+   import { Ziggy } from './ziggy'
+
+   createApp({ render: () => h(App, props) })
+     .use(plugin)
+     .use(ZiggyVue, Ziggy)
+     .mount(el)
+   ```
+
+### まとめ
+
+- ルートを変えたら `ziggy:generate` を再実行 → ファイルをコミット
+- 本番は git pull だけで OK（本番での `ziggy:generate` は不要）
+- `.vue` では `route('posts.store')` などをそのまま使える（alias 追加不要）
 
 ---
 
