@@ -170,12 +170,14 @@ cd /install
 FM_ASSISTED_INSTALL=/install apt install /install/filemaker-server-22.0.2.204-arm64.deb
 ```
 
--不要な nginx を停止・自動起動無効化【独自補足】
+~~-不要な nginx を停止・自動起動無効化【独自補足】~~
 
 ```bash
 systemctl stop nginx
 systemctl disable nginx.service
 ```
+
+↑ これは、FMSインストール時に実行されているので不要
 
 ---
 
