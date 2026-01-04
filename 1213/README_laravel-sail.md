@@ -237,7 +237,7 @@ Route::get('/', function () {
    ```
 
    ```text
-    App\Models\History::all()
+    App\Models\Angler::all()
    ```
 
    セッション終了は `Ctrl + D`（macOS / Linux）または `Ctrl + Z` → `Enter`（Windows）。
