@@ -32,7 +32,7 @@ class AuthController extends Controller
         );
 
         $credentials = $request->only('email', 'password');
-        $credentials['email'] = str_replace('@', '\\@', $credentials['email']);
+        $credentials['email'] = '==' . str_replace('@', '\@', $credentials['email']);
 
         if (!Auth::attempt($credentials, true)) {
             throw ValidationException::withMessages([
@@ -93,11 +93,11 @@ $request->validate([
 
 ```php
 $credentials = $request->only('email', 'password');
-$credentials['email'] = str_replace('@', '\@', $credentials['email']);
+$credentials['email'] = '==' . str_replace('@', '\@', $credentials['email']);
 ```
 
 - `Auth::attempt()` に渡す配列を作ります
-- `email` の `@` を `\@` に置換しているのは **FileMaker 側検索の都合**（※運用ルールに合わせる）
+- `email` の `@` を `\@` に置換し、`'=='` を前置して **FileMaker で完全一致検索**させるための調整です（※運用ルールに合わせる）
   - ここは「このプロジェクト固有の小さな調整」です
   - 認証フロー自体は Laravel 標準のままです
 
@@ -114,7 +114,7 @@ if (!Auth::attempt($credentials, true)) { // true is for remember me
 ```
 
 - `Auth::attempt($credentials, true)` は **標準のログイン処理**です
-- `true` を渡すと \*\*remember me（ログイン保持）\*\*を有効にします
+- `true` を渡すと **remember me（ログイン保持）**を有効にします
 
 ここで重要なのは次の点です。
 
