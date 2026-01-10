@@ -13,7 +13,6 @@
 ```php
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'create'])->name('login');
@@ -22,12 +21,19 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/', function () {
-        return Inertia::render('Index/Index');
+        return inertia('Index/Index');
     })->name('index');
 
     Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
 });
 ```
+
+### 補足: inertia() と Inertia::render()
+
+inertia() は Inertia::render() のショートカットです。
+Laravel / Inertia では helper の inertia() を使うのが一般的です。
+Inertia::render を使う場合は `use Inertia\Inertia;` を追加してください。
+教材では簡潔さを優先して inertia() を採用します。
 
 ---
 
@@ -57,7 +63,7 @@ Route::middleware('guest')->group(function () {
 ```php
 Route::middleware('auth')->group(function () {
     Route::get('/', function () {
-        return Inertia::render('Index/Index');
+        return inertia('Index/Index');
     })->name('index');
 
     Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
