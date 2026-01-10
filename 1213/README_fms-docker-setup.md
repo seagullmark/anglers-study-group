@@ -93,7 +93,7 @@ RUN DEBIAN_FRONTEND=noninteractive      \
 
 # COPY . /install/
  
-# document the ports that should be
+# document the ports that may be
 # published when filemaker server
 # is installed
 EXPOSE 80
@@ -119,6 +119,11 @@ docker build -t anglers-fms:prep .
 
 ---
 
+## 🌐 ポート公開方針（重要）
+
+- 通常運用は HTTPS（443）前提のため **80 は公開しない**
+- 80 は **FileMaker Server 内蔵 Let’s Encrypt（HTTP-01）** を使う場合のみ必要
+
 ## 🚀 セットアップ用コンテナ起動
 
 ```bash
@@ -127,7 +132,6 @@ docker run \
   --hostname anglers-fms \
   --name anglers-fms \
   --privileged \
-  --publish 80:80 \
   --publish 443:443 \
   --publish 2399:2399 \
   --publish 5003:5003 \
@@ -135,6 +139,8 @@ docker run \
   --volume ~/dockerenv/anglers-fms/Database:"/opt/FileMaker/FileMaker Server/Data" \
   anglers-fms:prep
 ```
+
+※ Let’s Encrypt を使う場合のみ、上記に `--publish 80:80` を追加する。
 
 ---
 
@@ -217,13 +223,14 @@ docker run \
   --hostname anglers-fms \
   --name anglers-fms \
   --privileged \
-  --publish 80:80 \
   --publish 443:443 \
   --publish 2399:2399 \
   --publish 5003:5003 \
   --volume ~/dockerenv/anglers-fms/Database:"/opt/FileMaker/FileMaker Server/Data" \
   anglers-fms:final
 ```
+
+※ Let’s Encrypt を使う場合のみ、上記に `--publish 80:80` を追加する。
 
 ---
 
