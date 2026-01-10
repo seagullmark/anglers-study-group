@@ -16,7 +16,7 @@ docker pull ubuntu:24.04
 
 ## ⚙️ Docker Desktop 設定メモ（macOS）【独自補足】
 
-Settings → Resources → File Sharing の "Choose file sharing implementation for your containers" は、デフォルト値の `VirtioFS` のままではインストールが失敗するため、必ず `gRPC FUSE` に切り替えること。
+Settings → General → Virtual Machine Options の "Choose file sharing implementation for your containers" は、デフォルト値の `VirtioFS` のままではインストールが失敗するため、必ず `gRPC FUSE` に切り替えること。
 
 ---
 
