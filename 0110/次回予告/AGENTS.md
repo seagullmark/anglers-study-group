@@ -30,7 +30,7 @@ AI の利用範囲：
 - Vue **3**（`<script setup>`）
 - Inertia.js **v2**
 - Ziggy（フロントエンドのURL生成は `route()` を使用）
-- Tailwind CSS **v3**
+- Tailwind CSS **v4**
 - CSP 有効（nonce / hash 運用、**unsafe-inline 禁止**）
 - FileMaker **Data API** + **Eloquent-FileMaker**
   - DB は FileMaker
