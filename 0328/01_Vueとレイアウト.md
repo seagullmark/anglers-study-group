@@ -178,6 +178,56 @@ form.post(route('login.store'), {
 
 ---
 
+## 1-6 JSON 文字列にして渡さない
+
+### ここで強く押さえること
+
+Inertia では、
+Laravel から渡した props は
+内部的にシリアライズされて Vue に渡る。
+
+これは Inertia の通常動作であり、
+問題ではない。
+
+問題になるのは、
+開発側が自分で次のような流れを作ること。
+
+- `json_encode()` する
+- 文字列として渡す
+- Vue 側で `JSON.parse()` する
+
+### こういうコードはズレる
+
+```php
+return inertia('FishingTrips/Form', [
+    'trip' => json_encode($trip),
+]);
+```
+
+```js
+const trip = JSON.parse(props.trip)
+```
+
+### なぜズレるのか
+
+- Inertia の props の流れを崩す
+- Vue 側で余計な変換が必要になる
+- データの形が分かりにくくなる
+- 「Laravel から何を渡しているか」が曖昧になる
+
+### この教材での方針
+
+- Collection や配列は、そのまま Inertia に渡してよい
+- 必要なら `map()` で画面用の形に整える
+- ただし JSON 文字列を手で組み立てて渡さない
+
+> Inertia では、  
+> **JSON 化そのものが問題ではない。**
+>
+> **自分で JSON 文字列を作って渡し、Vue 側でまた戻すのがズレ。**
+
+---
+
 ## 第1章のまとめ
 
 > Vue 側で最初に整えるべきなのは、  
@@ -188,3 +238,4 @@ form.post(route('login.store'), {
 - `SingleLayout` は単体画面用の最小レイアウトとして使える
 - `Login.vue` は `useForm` と `form.post()` で Inertia の流れに沿って送信する
 - Vue は見た目と入力操作に集中し、通信の流れは統一しておく
+- JSON 文字列を手で組み立てて渡す形は取らない
